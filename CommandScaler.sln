@@ -14,12 +14,20 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommandScaler", "src\CommandScaler\CommandScaler.csproj", "{554553C0-576C-495B-80A1-76639B141215}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{1B7AC1F8-AAB9-4F6A-8986-E768D3681204}"
+	ProjectSection(SolutionItems) = preProject
+		samples\docker-compose.yml = samples\docker-compose.yml
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommandScaler.Sample.API", "samples\CommandScaler.Sample.API\CommandScaler.Sample.API.csproj", "{D70AA6BE-EAF9-4868-8CE2-DE5208F6DCC8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommandScaler.Sample.Handler", "samples\CommandScaler.Sample.Handler\CommandScaler.Sample.Handler.csproj", "{E7063EB3-63BB-4954-9459-C1083D044EAF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommandScaler.Sample.Core", "samples\CommandScaler.Sample.Core\CommandScaler.Sample.Core.csproj", "{A4BA6CB5-D14F-495B-BF7A-3D886EC3A9BC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "rabbitmq", "rabbitmq", "{DEE9877A-7C94-40D7-AB17-7481A5E95CE3}"
+	ProjectSection(SolutionItems) = preProject
+		samples\rabbitmq\enabled_plugins = samples\rabbitmq\enabled_plugins
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -64,6 +72,7 @@ Global
 		{D70AA6BE-EAF9-4868-8CE2-DE5208F6DCC8} = {1B7AC1F8-AAB9-4F6A-8986-E768D3681204}
 		{E7063EB3-63BB-4954-9459-C1083D044EAF} = {1B7AC1F8-AAB9-4F6A-8986-E768D3681204}
 		{A4BA6CB5-D14F-495B-BF7A-3D886EC3A9BC} = {1B7AC1F8-AAB9-4F6A-8986-E768D3681204}
+		{DEE9877A-7C94-40D7-AB17-7481A5E95CE3} = {1B7AC1F8-AAB9-4F6A-8986-E768D3681204}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B676D674-E76B-4CAC-8569-753A59412A70}

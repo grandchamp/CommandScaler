@@ -16,6 +16,7 @@ namespace CommandScaler.Sample.Handler
                                   .Build();
 
             WebHost.CreateDefaultBuilder(args)
+                   .UseUrls("http://[::]:81")
                    .UseConfiguration(configuration)
                    .UseStartup<Startup>()
                    .Build()

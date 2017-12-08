@@ -1,0 +1,36 @@
+version: '3.1'
+
+services:
+  commandscaler.sample.api:
+    image: commandscaler.sample.api
+    build:
+      context: ./CommandScaler.Sample.API
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    depends_on:
+      - rabbitmq
+      
+  commandscaler.sample.handler:
+    image: commandscaler.sample.handler
+    build:
+      context: ./CommandScaler.Sample.Handler
+      dockerfile: Dockerfile
+    depends_on:
+      - rabbitmq
+      
+  rabbitmq:
+    image: "rabbitmq:3-management"
+    hostname: "rabbitmq"
+    environment:
+      RABBITMQ_ERLANG_COOKIE: "SWQOKODSQALRPCLNMEQG"
+      RABBITMQ_DEFAULT_USER: "admin"
+      RABBITMQ_DEFAULT_PASS: "123456"
+      RABBITMQ_DEFAULT_VHOST: "/"
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    labels:
+      NAME: "rabbitmq1"
+    volumes:
+      - "./rabbitmq/enabled_plugins:/etc/rabbitmq/enabled_plugins"

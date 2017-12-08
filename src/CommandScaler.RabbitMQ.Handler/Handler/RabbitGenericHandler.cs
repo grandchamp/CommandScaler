@@ -34,6 +34,8 @@ namespace CommandScaler.RabbitMQ.Handler.Handler
 
             consumer.Received += async (model, ea) =>
             {
+                _log.LogInformation($"Received command.");
+
                 var body = ea.Body;
                 var props = ea.BasicProperties;
                 var replyProps = channel.CreateBasicProperties();

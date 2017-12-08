@@ -28,7 +28,7 @@ namespace CommandScaler.RabbitMQ.Handler.Tests
             handlerList.Add(typeof(TestCommandHandler1).GetCommandHandlerInterface(), new TestCommandHandler1());
             handlerList.Add(typeof(TestCommandHandler2).GetCommandHandlerInterface(), new TestCommandHandler2());
 
-            _rabbitGenericHandler = new RabbitGenericHandler(handlerList, logger, connectionManager, bus);
+            _rabbitGenericHandler = new RabbitGenericHandler(handlerList, logger, connectionManager);
         }
 
         [Fact]

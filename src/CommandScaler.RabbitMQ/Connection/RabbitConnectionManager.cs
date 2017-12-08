@@ -3,7 +3,9 @@ using CommandScaler.RabbitMQ.Connection.Contracts;
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Polly;
 using RabbitMQ.Client;
+using RabbitMQ.Client.Exceptions;
 using System;
 using System.Threading.Tasks;
 
@@ -33,7 +35,9 @@ namespace CommandScaler.RabbitMQ.Connection
                         Password = _rabbitConfiguration.Value.Password
                     };
 
-                    _connection = rabbitFactory.CreateConnection();
+                    Policy.Handle<BrokerUnreachableException>()
+                          .WaitAndRetry(3, x => TimeSpan.FromSeconds(10))
+                          .Execute(() => _connection = rabbitFactory.CreateConnection());
                 }
 
                 return Task.FromResult(Result.Ok(true));
@@ -46,6 +50,12 @@ namespace CommandScaler.RabbitMQ.Connection
             }
         }
 
-        public Task<IModel> CreateChannel() => Task.FromResult(_connection.CreateModel());
+        public async Task<IModel> CreateChannel()
+        {
+            if (_connection == null)
+                await Open();
+
+            return _connection.CreateModel());
+        }
     }
 }

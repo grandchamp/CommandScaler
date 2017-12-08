@@ -2,9 +2,8 @@
 
 namespace CommandScaler.Handlers
 {
-    public interface IHandlerList
+    public interface IHandlerFactory
     {
-        void Add(Type key, IBaseCommandHandler commandHandler);
         IBaseCommandHandler Get(Type key);
     }
 }

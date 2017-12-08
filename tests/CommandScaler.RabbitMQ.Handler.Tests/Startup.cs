@@ -21,6 +21,8 @@ namespace CommandScaler.RabbitMQ.Handler.Tests
         {
             services.Configure<RabbitConfiguration>(Configuration.GetSection("RabbitMQ"));
 
+            services.AddSingleton<TestDependency>();
+
             services.AddCommandScaler(new[] { typeof(TestCommand1).Assembly })
                     .AddRabbitMQCommandScaler()
                     .ConfigureRabbitMQHandler();

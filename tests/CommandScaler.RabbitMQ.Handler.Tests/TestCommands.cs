@@ -25,6 +25,13 @@ namespace CommandScaler.RabbitMQ.Handler.Tests
 
     public class TestCommandHandler2 : ICommandHandler<TestCommand2, string>
     {
-        public async Task<string> Handle(TestCommand2 command) => command.ValueToReturn;
+        private readonly TestDependency _testDependency;
+
+        public TestCommandHandler2(TestDependency testDependency)
+        {
+            _testDependency = testDependency;
+        }
+
+        public async Task<string> Handle(TestCommand2 command) => string.Concat(command.ValueToReturn, " ", _testDependency.GetDependencyString());
     }
 }

@@ -40,11 +40,11 @@ namespace CommandScaler.RabbitMQ.Handler.Tests.Integration
         }
 
         [Fact]
-        public async Task TestCommand2ReturnsCorrectValue()
+        public async Task TestCommand2WithDIDependencyReturnsCorrectValue()
         {
             var result = await _client.GetStringAsync("/run/2");
 
-            Assert.Equal("a", result);
+            Assert.Equal("a DependencyString", result);
         }
     }
 }

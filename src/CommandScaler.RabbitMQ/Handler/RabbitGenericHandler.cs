@@ -12,12 +12,12 @@ namespace CommandScaler.RabbitMQ.Handler
 {
     public class RabbitGenericHandler
     {
-        private readonly IHandlerList _handlerList;
+        private readonly IHandlerFactory _handlerFactory;
         private readonly ILogger<RabbitGenericHandler> _log;
         private readonly IRabbitConnectionManager _connectionManager;
-        public RabbitGenericHandler(IHandlerList handlerList, ILogger<RabbitGenericHandler> log, IRabbitConnectionManager connectionManager)
+        public RabbitGenericHandler(IHandlerFactory handlerFactory, ILogger<RabbitGenericHandler> log, IRabbitConnectionManager connectionManager)
         {
-            _handlerList = handlerList;
+            _handlerFactory = handlerFactory;
             _log = log;
             _connectionManager = connectionManager;
         }
@@ -50,7 +50,7 @@ namespace CommandScaler.RabbitMQ.Handler
                     var genericCommandHandlerType = typeof(ICommandHandler<,>);
                     var requestCommandHandlerType = genericCommandHandlerType.MakeGenericType(request.Command.GetType(), Type.GetType(request.CommandReturnType));
 
-                    var handler = _handlerList.Get(requestCommandHandlerType);
+                    var handler = _handlerFactory.Get(requestCommandHandlerType);
 
                     var handleMethodInfo = handler.GetType().GetMethod("Handle");
                     var handleMethodParameters = handleMethodInfo.GetParameters();

@@ -3,6 +3,7 @@ using CommandScaler.Handlers;
 using CommandScaler.RabbitMQ.Configuration;
 using CommandScaler.RabbitMQ.Connection;
 using CommandScaler.RabbitMQ.Manager;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NSubstitute;
@@ -34,11 +35,13 @@ namespace CommandScaler.RabbitMQ.Handler.Tests.Integration
 
             _bus = new RabbitBus(connectionManager, rabbitBusLogger);
 
-            var handlerList = new HandlerList();
-            handlerList.Add(typeof(TestCommandHandler1).GetCommandHandlerInterface(), new TestCommandHandler1());
-            handlerList.Add(typeof(TestCommandHandler2).GetCommandHandlerInterface(), new TestCommandHandler2());
+            var serviceCollection = new ServiceCollection();
+            serviceCollection.AddTransient(typeof(TestCommandHandler1).GetCommandHandlerInterface(), typeof(TestCommandHandler1));
+            serviceCollection.AddTransient(typeof(TestCommandHandler2).GetCommandHandlerInterface(), typeof(TestCommandHandler2));
 
-            var rabbitGenericHandler = new RabbitGenericHandler(handlerList, rabbitGenericHandlerLogger, connectionManager);
+            var handlerFactory = new HandlerFactory(serviceCollection.BuildServiceProvider());
+
+            var rabbitGenericHandler = new RabbitGenericHandler(handlerFactory, rabbitGenericHandlerLogger, connectionManager);
             rabbitGenericHandler.CreateHandler().GetAwaiter().GetResult();
         }
 

@@ -55,7 +55,7 @@ namespace CommandScaler.RabbitMQ.Connection
             if (_connection == null)
                 await Open();
 
-            return _connection.CreateModel());
+            return _connection.CreateModel();
         }
     }
 }

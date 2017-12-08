@@ -1,6 +1,4 @@
-﻿using CommandScaler.RabbitMQ.Configuration;
-using CSharpFunctionalExtensions;
-using Microsoft.Extensions.Options;
+﻿using CSharpFunctionalExtensions;
 using RabbitMQ.Client;
 using System.Threading.Tasks;
 

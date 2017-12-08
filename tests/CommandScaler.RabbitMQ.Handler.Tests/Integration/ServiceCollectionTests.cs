@@ -1,15 +1,12 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using CommandScaler.Bus.Contracts;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.IO;
-using Microsoft.Extensions.Configuration;
-using Xunit;
-using System.Threading.Tasks;
-using CommandScaler.Bus.Contracts;
 using System.Net.Http;
+using System.Threading.Tasks;
+using Xunit;
 
 namespace CommandScaler.RabbitMQ.Handler.Tests.Integration
 {

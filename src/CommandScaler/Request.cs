@@ -1,8 +1,5 @@
-﻿using System;
-
-namespace CommandScaler
+﻿namespace CommandScaler
 {
-    [Serializable]
     public class Request
     {
         public string CommandReturnType { get; set; }

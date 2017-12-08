@@ -1,7 +1,5 @@
 ﻿using CommandScaler.Handlers;
 using System;
-using System.Linq;
-using System.Reflection;
 
 namespace CommandScaler
 {

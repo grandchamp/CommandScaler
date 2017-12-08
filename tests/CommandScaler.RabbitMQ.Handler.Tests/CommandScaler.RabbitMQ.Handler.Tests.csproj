@@ -21,7 +21,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\CommandScaler.RabbitMQ.Handler\CommandScaler.RabbitMQ.Handler.csproj" />
     <ProjectReference Include="..\..\src\CommandScaler.RabbitMQ\CommandScaler.RabbitMQ.csproj" />
     <ProjectReference Include="..\..\src\CommandScaler\CommandScaler.csproj" />
   </ItemGroup>

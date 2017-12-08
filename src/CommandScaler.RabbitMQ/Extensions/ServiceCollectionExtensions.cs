@@ -1,6 +1,7 @@
 ﻿using CommandScaler.Bus.Contracts;
 using CommandScaler.RabbitMQ.Connection;
 using CommandScaler.RabbitMQ.Connection.Contracts;
+using CommandScaler.RabbitMQ.Handler;
 using CommandScaler.RabbitMQ.Manager;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -14,6 +15,11 @@ namespace CommandScaler
             serviceCollection.AddScoped<IBus, RabbitBus>();
 
             return serviceCollection;
+        }
+
+        public static void ConfigureRabbitMQHandler(this IServiceCollection serviceCollection)
+        {
+            serviceCollection.AddSingleton<RabbitGenericHandler>();
         }
     }
 }

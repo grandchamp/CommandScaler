@@ -1,7 +1,6 @@
 using CommandScaler.Bus.Contracts;
 using CommandScaler.Handlers;
 using CommandScaler.RabbitMQ.Connection.Contracts;
-using CommandScaler.RabbitMQ.Handler.Handler;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using RabbitMQ.Client;

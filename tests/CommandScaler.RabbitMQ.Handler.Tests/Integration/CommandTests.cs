@@ -2,7 +2,6 @@
 using CommandScaler.Handlers;
 using CommandScaler.RabbitMQ.Configuration;
 using CommandScaler.RabbitMQ.Connection;
-using CommandScaler.RabbitMQ.Handler.Handler;
 using CommandScaler.RabbitMQ.Manager;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;

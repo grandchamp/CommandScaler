@@ -1,5 +1,4 @@
-﻿using CommandScaler.Bus.Contracts;
-using CommandScaler.Handlers;
+﻿using CommandScaler.Handlers;
 using CommandScaler.RabbitMQ.Connection.Contracts;
 using CommandScaler.RabbitMQ.Manager;
 using Microsoft.Extensions.Logging;
@@ -9,7 +8,7 @@ using RabbitMQ.Client.Events;
 using System;
 using System.Threading.Tasks;
 
-namespace CommandScaler.RabbitMQ.Handler.Handler
+namespace CommandScaler.RabbitMQ.Handler
 {
     public class RabbitGenericHandler
     {

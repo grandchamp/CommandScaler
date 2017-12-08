@@ -5,8 +5,6 @@ VisualStudioVersion = 15.0.27130.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommandScaler.RabbitMQ", "src\CommandScaler.RabbitMQ\CommandScaler.RabbitMQ.csproj", "{DE49B74C-376F-4914-AC0E-00BAFE84AEAD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommandScaler.RabbitMQ.Handler", "src\CommandScaler.RabbitMQ.Handler\CommandScaler.RabbitMQ.Handler.csproj", "{90305D4E-FB57-4EFB-868A-E0A67E094E5D}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{46167E89-1CEE-496B-8F9C-68C8978E56A4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommandScaler.RabbitMQ.Handler.Tests", "tests\CommandScaler.RabbitMQ.Handler.Tests\CommandScaler.RabbitMQ.Handler.Tests.csproj", "{72B68849-42C0-43B4-ACD4-A1D98479E32C}"
@@ -39,10 +37,6 @@ Global
 		{DE49B74C-376F-4914-AC0E-00BAFE84AEAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DE49B74C-376F-4914-AC0E-00BAFE84AEAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DE49B74C-376F-4914-AC0E-00BAFE84AEAD}.Release|Any CPU.Build.0 = Release|Any CPU
-		{90305D4E-FB57-4EFB-868A-E0A67E094E5D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{90305D4E-FB57-4EFB-868A-E0A67E094E5D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{90305D4E-FB57-4EFB-868A-E0A67E094E5D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{90305D4E-FB57-4EFB-868A-E0A67E094E5D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{72B68849-42C0-43B4-ACD4-A1D98479E32C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{72B68849-42C0-43B4-ACD4-A1D98479E32C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{72B68849-42C0-43B4-ACD4-A1D98479E32C}.Release|Any CPU.ActiveCfg = Release|Any CPU

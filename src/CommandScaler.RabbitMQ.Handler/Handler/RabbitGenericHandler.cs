@@ -16,13 +16,11 @@ namespace CommandScaler.RabbitMQ.Handler.Handler
         private readonly IHandlerList _handlerList;
         private readonly ILogger<RabbitGenericHandler> _log;
         private readonly IRabbitConnectionManager _connectionManager;
-        private readonly IBus _bus;
-        public RabbitGenericHandler(IHandlerList handlerList, ILogger<RabbitGenericHandler> log, IRabbitConnectionManager connectionManager, IBus bus)
+        public RabbitGenericHandler(IHandlerList handlerList, ILogger<RabbitGenericHandler> log, IRabbitConnectionManager connectionManager)
         {
             _handlerList = handlerList;
             _log = log;
             _connectionManager = connectionManager;
-            _bus = bus;
         }
 
         public Task CreateHandler()

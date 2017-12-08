@@ -35,12 +35,17 @@ services.AddCommandScaler(new[] { typeof(YourCommand).Assembly })
 For `AddCommandScaler` method you should pass the assemblies where your `ICommandHandler` are defined (you can have multiple here), so the lib will be able to scan and register them.
 
 ## 3. Start the CommandScaler handler
+### 3.1 Start just the `IBus`
 
 On your `Configure` method on `Startup.cs` add:
 ```
-await app.StartRabbitMQHandler();
+await app.StartCommandScaler();
 ```
 
+### 3.2 Start `IBus` and `RabbitGenericHandler`
+```
+await app.StartRabbitMQHandler();
+```
 This will start the listener.
 
 # Using
@@ -81,3 +86,5 @@ To start using, you should inject `IBus` interface when you need to send command
 ```
 
 On `result` you'll have the value returned from the `Handle` method of your `ICommandHandler`.
+
+Check the samples if you have any doubt.

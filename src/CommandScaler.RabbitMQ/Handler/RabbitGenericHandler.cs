@@ -29,6 +29,7 @@ namespace CommandScaler.RabbitMQ.Handler
             channel.QueueDeclare(RabbitBus.QUEUE_NAME, false, false, true, null);
 
             var consumer = new EventingBasicConsumer(channel);
+            channel.BasicQos(0, 1, false);
             channel.BasicConsume(queue: RabbitBus.QUEUE_NAME, autoAck: false, consumer: consumer);
 
             consumer.Received += async (model, ea) =>
@@ -53,7 +54,6 @@ namespace CommandScaler.RabbitMQ.Handler
                     var handler = _handlerFactory.Get(requestCommandHandlerType);
 
                     var handleMethodInfo = handler.GetType().GetMethod("Handle");
-                    var handleMethodParameters = handleMethodInfo.GetParameters();
 
                     var handle = (Task)handleMethodInfo.Invoke(handler, new object[] { request.Command });
                     await handle;

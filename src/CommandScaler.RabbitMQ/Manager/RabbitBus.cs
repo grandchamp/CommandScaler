@@ -5,13 +5,16 @@ using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace CommandScaler.RabbitMQ.Manager
 {
-    public class RabbitBus : IBus
+    public class RabbitBus : IBus, IDisposable
     {
         public const string QUEUE_NAME = "commandscaler.bus";
+
+        private bool disposed;
 
         private readonly IRabbitConnectionManager _connectionManager;
         private readonly IModel _channel;
@@ -22,6 +25,23 @@ namespace CommandScaler.RabbitMQ.Manager
             _log = log;
 
             _channel = connectionManager.CreateChannel().GetAwaiter().GetResult();
+            disposed = false;
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            _log.LogInformation("Dispose called.");
+
+            if (!disposed && disposing)
+                _channel?.Dispose();
+
+            disposed = true;
         }
 
         public Task FireAndForget(ICommand<Unit> command)
@@ -46,10 +66,12 @@ namespace CommandScaler.RabbitMQ.Manager
             }
         }
 
-        public async Task<TResult> Send<TResult>(ICommand<TResult> command)
+        public Task<TResult> Send<TResult>(ICommand<TResult> command)
         {
             try
             {
+                _log.LogInformation($"Running on: {Thread.CurrentThread.ManagedThreadId}");
+
                 CreateQueueIfNotExists(QUEUE_NAME);
 
                 var replyQueueName = _channel.QueueDeclare().QueueName;
@@ -84,7 +106,7 @@ namespace CommandScaler.RabbitMQ.Manager
 
                 _channel.BasicConsume(consumer: consumer, queue: replyQueueName, autoAck: true);
 
-                return await tcs.Task;
+                return tcs.Task;
             }
             catch (Exception ex)
             {

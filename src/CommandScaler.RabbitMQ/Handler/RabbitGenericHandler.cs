@@ -55,14 +55,13 @@ namespace CommandScaler.RabbitMQ.Handler
 
                     var handler = _handlerFactory.Get(requestCommandHandlerType);
 
-                    var handlerType = handler.GetType();
-                    var handleMethodInfo = handlerType.GetMethod("Handle");
+                    var handleMethodInfo = handler.GetType().GetMethod("Handle");
 
-                    var handle = (Task)handleMethodInfo.Invoke(handler, new object[] { request.Command });
+                    var handleMethod = (Task)handleMethodInfo.Invoke(handler, new object[] { request.Command });
 
-                    await handle;
+                    await handleMethod;
 
-                    response = handle.GetType().GetProperty("Result").GetValue(handle);
+                    response = handleMethod.GetType().GetProperty("Result").GetValue(handleMethod);
                 }
                 catch (Exception ex)
                 {

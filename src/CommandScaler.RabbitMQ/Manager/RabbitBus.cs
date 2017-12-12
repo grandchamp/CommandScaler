@@ -13,6 +13,7 @@ namespace CommandScaler.RabbitMQ.Manager
     public class RabbitBus : IBus, IDisposable
     {
         public const string QUEUE_NAME = "commandscaler.bus";
+        public const string DIRECT_REPLYTO_QUEUE_NAME = "amq.rabbitmq.reply-to";
 
         private bool disposed;
 
@@ -73,15 +74,14 @@ namespace CommandScaler.RabbitMQ.Manager
                 _log.LogInformation($"Running on: {Thread.CurrentThread.ManagedThreadId}");
 
                 CreateQueueIfNotExists(QUEUE_NAME);
-
-                var replyQueueName = _channel.QueueDeclare().QueueName;
+                
                 var consumer = new EventingBasicConsumer(_channel);
                 var props = _channel.CreateBasicProperties();
-
+                
                 var correlationId = Guid.NewGuid().ToString();
                 props.CorrelationId = correlationId;
-                props.ReplyTo = replyQueueName;
-
+                props.ReplyTo = DIRECT_REPLYTO_QUEUE_NAME;
+                
                 var tcs = new TaskCompletionSource<TResult>();
 
                 consumer.Received += (model, ea) =>
@@ -101,10 +101,10 @@ namespace CommandScaler.RabbitMQ.Manager
                 {
                     TypeNameHandling = TypeNameHandling.Auto
                 });
-
+                
+                _channel.BasicConsume(consumer: consumer, queue: DIRECT_REPLYTO_QUEUE_NAME, autoAck: true);
+                
                 _channel.BasicPublish(exchange: "", routingKey: QUEUE_NAME, basicProperties: props, body: json.Serialize());
-
-                _channel.BasicConsume(consumer: consumer, queue: replyQueueName, autoAck: true);
 
                 return tcs.Task;
             }

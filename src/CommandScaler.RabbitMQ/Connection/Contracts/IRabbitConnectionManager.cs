@@ -1,5 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
-using RabbitMQ.Client;
+using RabbitMqNext;
 using System.Threading.Tasks;
 
 namespace CommandScaler.RabbitMQ.Connection.Contracts
@@ -8,6 +8,6 @@ namespace CommandScaler.RabbitMQ.Connection.Contracts
     {
         Task<Result<bool>> Open();
 
-        Task<IModel> CreateChannel();
+        Task<IChannel> CreateChannel();
     }
 }

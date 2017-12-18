@@ -3,8 +3,7 @@ using CommandScaler.RabbitMQ.Connection.Contracts;
 using CommandScaler.RabbitMQ.Manager;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using RabbitMQ.Client;
-using RabbitMQ.Client.Events;
+using RabbitMqNext;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,6 +15,7 @@ namespace CommandScaler.RabbitMQ.Handler
         private readonly IHandlerFactory _handlerFactory;
         private readonly ILogger<RabbitGenericHandler> _log;
         private readonly IRabbitConnectionManager _connectionManager;
+        private IChannel _channel;
         public RabbitGenericHandler(IHandlerFactory handlerFactory, ILogger<RabbitGenericHandler> log, IRabbitConnectionManager connectionManager)
         {
             _handlerFactory = handlerFactory;
@@ -23,24 +23,29 @@ namespace CommandScaler.RabbitMQ.Handler
             _connectionManager = connectionManager;
         }
 
-        public Task CreateHandler()
+        public async Task CreateHandler()
         {
-            var channel = _connectionManager.CreateChannel().GetAwaiter().GetResult();
+            _channel = await _connectionManager.CreateChannel();
 
-            channel.QueueDeclare(RabbitBus.QUEUE_NAME, false, false, true, null);
+            await _channel.QueueDeclare(queue: RabbitBus.QUEUE_NAME, passive: false, durable: true, exclusive: false, autoDelete: false,
+                                        arguments: null, waitConfirmation: true);
 
-            var consumer = new EventingBasicConsumer(channel);
-            channel.BasicQos(0, 1, false);
-            channel.BasicConsume(queue: RabbitBus.QUEUE_NAME, autoAck: false, consumer: consumer);
+            _channel.AddErrorCallback(error =>
+            {
+                return Task.CompletedTask;
+            });
 
-            consumer.Received += async (model, ea) =>
+            //await _channel.BasicQos(0, 1, false);
+            await _channel.BasicConsume(mode: ConsumeMode.SerializedWithBufferCopy, consumer: async (ea) =>
             {
                 _log.LogInformation($"Running Handler on: {Thread.CurrentThread.ManagedThreadId}");
                 _log.LogInformation($"Received command.");
 
-                var body = ea.Body;
-                var props = ea.BasicProperties;
-                var replyProps = channel.CreateBasicProperties();
+                var body = new byte[ea.bodySize];
+                await ea.stream.ReadAsync(body, 0, ea.bodySize);
+
+                var props = ea.properties;
+                var replyProps = _channel.RentBasicProperties();
                 replyProps.CorrelationId = props.CorrelationId;
 
                 object response = new object();
@@ -71,15 +76,13 @@ namespace CommandScaler.RabbitMQ.Handler
                 {
                     var responseBytes = response.Serialize();
 
-                    channel.BasicPublish(exchange: "", routingKey: props.ReplyTo,
-                                         basicProperties: replyProps, body: responseBytes);
+                    _channel.BasicPublishFast(exchange: "", routingKey: props.ReplyTo,
+                                             properties: replyProps, buffer: responseBytes);
 
-                    channel.BasicAck(deliveryTag: ea.DeliveryTag,
-                                     multiple: false);
+                    //_channel.BasicAck(deliveryTag: ea.deliveryTag,
+                    //                 multiple: false);
                 }
-            };
-
-            return Task.CompletedTask;
+            }, queue: RabbitBus.QUEUE_NAME, consumerTag: "", withoutAcks: true, exclusive: false, arguments: null, waitConfirmation: true);
         }
     }
 }

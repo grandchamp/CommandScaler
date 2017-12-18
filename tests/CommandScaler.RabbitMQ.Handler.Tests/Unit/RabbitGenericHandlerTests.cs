@@ -4,7 +4,7 @@ using CommandScaler.RabbitMQ.Connection.Contracts;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
-using RabbitMQ.Client;
+using RabbitMqNext;
 using System;
 using System.Collections.Concurrent;
 using Xunit;
@@ -18,7 +18,7 @@ namespace CommandScaler.RabbitMQ.Handler.Tests
         {
             var logger = Substitute.For<ILogger<RabbitGenericHandler>>();
             var connectionManager = Substitute.For<IRabbitConnectionManager>();
-            var model = Substitute.For<IModel>();
+            var model = Substitute.For<IChannel>();
             connectionManager.CreateChannel().Returns(model);
 
             var bus = Substitute.For<IBus>();

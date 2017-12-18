@@ -2,15 +2,14 @@
 using CommandScaler.RabbitMQ.Connection.Contracts;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using RabbitMQ.Client;
-using RabbitMQ.Client.Events;
+using RabbitMqNext;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace CommandScaler.RabbitMQ.Manager
 {
-    public class RabbitBus : IBus, IDisposable
+    public class RabbitBus : IBus/*, IDisposable*/
     {
         public const string QUEUE_NAME = "commandscaler.bus";
         public const string DIRECT_REPLYTO_QUEUE_NAME = "amq.rabbitmq.reply-to";
@@ -18,7 +17,7 @@ namespace CommandScaler.RabbitMQ.Manager
         private bool disposed;
 
         private readonly IRabbitConnectionManager _connectionManager;
-        private readonly IModel _channel;
+        private IChannel _channel;
         private readonly ILogger<RabbitBus> _log;
         public RabbitBus(IRabbitConnectionManager connectionManager, ILogger<RabbitBus> log)
         {
@@ -29,35 +28,33 @@ namespace CommandScaler.RabbitMQ.Manager
             disposed = false;
         }
 
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
+        //public void Dispose()
+        //{
+        //    Dispose(true);
+        //    GC.SuppressFinalize(this);
+        //}
 
-        protected virtual void Dispose(bool disposing)
-        {
-            _log.LogInformation("Dispose called.");
+        //protected virtual void Dispose(bool disposing)
+        //{
+        //    _log.LogInformation("Dispose called.");
 
-            if (!disposed && disposing)
-                _channel?.Dispose();
+        //    if (!disposed && disposing)
+        //        _channel?.Dispose();
 
-            disposed = true;
-        }
+        //    disposed = true;
+        //}
 
-        public Task FireAndForget(ICommand<Unit> command)
+        public async Task FireAndForget(ICommand<Unit> command)
         {
             try
             {
-                CreateQueueIfNotExists(QUEUE_NAME);
+                await CreateQueueIfNotExists(QUEUE_NAME);
 
                 var request = new Request { Command = command, CommandReturnType = typeof(Unit).FullName, CommandType = command.GetType().FullName };
 
                 var json = JsonConvert.SerializeObject(request);
 
-                _channel.BasicPublish(exchange: "", routingKey: QUEUE_NAME, basicProperties: _channel.CreateBasicProperties(), body: json.Serialize());
-
-                return Task.CompletedTask;
+                await _channel.BasicPublish(exchange: "", routingKey: QUEUE_NAME, properties: _channel.RentBasicProperties(), buffer: json.Serialize());
             }
             catch (Exception ex)
             {
@@ -67,33 +64,16 @@ namespace CommandScaler.RabbitMQ.Manager
             }
         }
 
-        public Task<TResult> Send<TResult>(ICommand<TResult> command)
+        public async Task<TResult> Send<TResult>(ICommand<TResult> command)
         {
             try
             {
                 _log.LogInformation($"Running on: {Thread.CurrentThread.ManagedThreadId}");
 
-                CreateQueueIfNotExists(QUEUE_NAME);
-                
-                var consumer = new EventingBasicConsumer(_channel);
-                var props = _channel.CreateBasicProperties();
-                
-                var correlationId = Guid.NewGuid().ToString();
-                props.CorrelationId = correlationId;
+                await CreateQueueIfNotExists(QUEUE_NAME);
+
+                var props = _channel.RentBasicProperties();
                 props.ReplyTo = DIRECT_REPLYTO_QUEUE_NAME;
-                
-                var tcs = new TaskCompletionSource<TResult>();
-
-                consumer.Received += (model, ea) =>
-                {
-                    var body = ea.Body;
-                    if (ea.BasicProperties.CorrelationId == correlationId)
-                    {
-                        var result = body.Deserialize<TResult>();
-
-                        tcs.SetResult(result);
-                    }
-                };
 
                 var request = new Request { Command = command, CommandReturnType = typeof(TResult).FullName, CommandType = command.GetType().FullName };
 
@@ -101,12 +81,26 @@ namespace CommandScaler.RabbitMQ.Manager
                 {
                     TypeNameHandling = TypeNameHandling.Auto
                 });
-                
-                _channel.BasicConsume(consumer: consumer, queue: DIRECT_REPLYTO_QUEUE_NAME, autoAck: true);
-                
-                _channel.BasicPublish(exchange: "", routingKey: QUEUE_NAME, basicProperties: props, body: json.Serialize());
 
-                return tcs.Task;
+                _channel.AddErrorCallback(error =>
+                {
+                    return Task.CompletedTask;
+                });
+
+                var rpcClient = await _channel.CreateRpcHelper(ConsumeMode.ParallelWithBufferCopy, null);
+                var rpcResult = await rpcClient.Call("", QUEUE_NAME, props, json.Serialize());
+
+                var buffer = new byte[rpcResult.bodySize];
+                await rpcResult.stream.ReadAsync(buffer, 0, rpcResult.bodySize);
+
+                if (rpcResult.properties.CorrelationId == props.CorrelationId)
+                {
+                    var result = buffer.Deserialize<TResult>();
+
+                    return result;
+                }
+
+                return default(TResult);
             }
             catch (Exception ex)
             {
@@ -116,6 +110,12 @@ namespace CommandScaler.RabbitMQ.Manager
             }
         }
 
-        private void CreateQueueIfNotExists(string queueName) => _channel.QueueDeclare(queueName, false, false, true, null);
+        private async Task CreateQueueIfNotExists(string queueName)
+        {
+            _channel = await _connectionManager.CreateChannel();
+
+            await _channel.QueueDeclare(queue: queueName, passive: false, durable: true, exclusive: false,
+                                        autoDelete: false, arguments: null, waitConfirmation: true);
+        }
     }
 }

@@ -3,8 +3,10 @@ using CommandScaler.RabbitMQ.Configuration;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System.Threading.Tasks;
 
 namespace CommandScaler.RabbitMQ.Handler.Tests
 {
@@ -23,6 +25,8 @@ namespace CommandScaler.RabbitMQ.Handler.Tests
 
             services.AddSingleton<TestDependency>();
 
+            services.AddRouting();
+
             services.AddCommandScaler(new[] { typeof(TestCommand1).Assembly })
                     .AddRabbitMQCommandScaler()
                     .ConfigureRabbitMQHandler();
@@ -30,10 +34,16 @@ namespace CommandScaler.RabbitMQ.Handler.Tests
 
         public async void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            await app.StartRabbitMQHandler();
-
             app.Map("/run/1", HandleRunTestCommand1);
-            app.Map("/run/2", HandleRunTestCommand2);
+
+            var routeBuilder = new RouteBuilder(app);
+
+            routeBuilder.MapGet("run/2/{value}", HandleRunTestCommand2);
+
+            var routes = routeBuilder.Build();
+            app.UseRouter(routes);
+
+            await app.StartRabbitMQHandler();
         }
 
         private static void HandleRunTestCommand1(IApplicationBuilder app)
@@ -47,15 +57,14 @@ namespace CommandScaler.RabbitMQ.Handler.Tests
             });
         }
 
-        private static void HandleRunTestCommand2(IApplicationBuilder app)
+        private static async Task HandleRunTestCommand2(HttpContext context)
         {
-            app.Run(async context =>
-            {
-                var bus = app.ApplicationServices.GetService<IBus>();
-                var result = await bus.Send(new TestCommand2 { ValueToReturn = "a" });
+            var value = context.GetRouteValue("value").ToString();
 
-                await context.Response.WriteAsync(result);
-            });
+            var bus = context.RequestServices.GetService<IBus>();
+            var result = await bus.Send(new TestCommand2 { ValueToReturn = value.PadLeft(4, '0') });
+
+            await context.Response.WriteAsync(result);
         }
     }
 }

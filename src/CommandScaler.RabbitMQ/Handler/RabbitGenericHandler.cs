@@ -23,9 +23,9 @@ namespace CommandScaler.RabbitMQ.Handler
             _connectionManager = connectionManager;
         }
 
-        public Task CreateHandler()
+        public async Task CreateHandler()
         {
-            var channel = _connectionManager.CreateChannel().GetAwaiter().GetResult();
+            var channel = await _connectionManager.CreateChannel();
 
             channel.QueueDeclare(RabbitBus.QUEUE_NAME, false, false, true, null);
 
@@ -78,8 +78,6 @@ namespace CommandScaler.RabbitMQ.Handler
                                      multiple: false);
                 }
             };
-
-            return Task.CompletedTask;
         }
     }
 }

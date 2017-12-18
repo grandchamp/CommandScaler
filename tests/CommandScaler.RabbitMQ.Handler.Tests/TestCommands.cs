@@ -32,6 +32,6 @@ namespace CommandScaler.RabbitMQ.Handler.Tests
             _testDependency = testDependency;
         }
 
-        public async Task<string> Handle(TestCommand2 command) => string.Concat(command.ValueToReturn, " ", _testDependency.GetDependencyString());
+        public Task<string> Handle(TestCommand2 command) => Task.FromResult(string.Concat(command.ValueToReturn, " ", _testDependency.GetDependencyString()));
     }
 }

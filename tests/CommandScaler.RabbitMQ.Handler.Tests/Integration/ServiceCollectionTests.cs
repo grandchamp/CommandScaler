@@ -14,7 +14,6 @@ namespace CommandScaler.RabbitMQ.Handler.Tests.Integration
     {
         private readonly TestServer _testServer;
         private readonly HttpClient _client;
-        private readonly IBus _bus;
         public ServiceCollectionTests()
         {
             var configuration = new ConfigurationBuilder()

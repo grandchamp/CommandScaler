@@ -17,9 +17,6 @@ namespace CommandScaler
             return serviceCollection;
         }
 
-        public static void ConfigureRabbitMQHandler(this IServiceCollection serviceCollection)
-        {
-            serviceCollection.AddSingleton<RabbitGenericHandler>();
-        }
+        public static void ConfigureRabbitMQHandler(this IServiceCollection serviceCollection) => serviceCollection.AddSingleton<RabbitGenericHandler>();
     }
 }

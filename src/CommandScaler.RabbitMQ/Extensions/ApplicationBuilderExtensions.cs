@@ -11,6 +11,7 @@ namespace CommandScaler
         public static async Task StartCommandScaler(this IApplicationBuilder app)
         {
             var rabbitConnectionManager = app.ApplicationServices.GetRequiredService<IRabbitConnectionManager>();
+
             await rabbitConnectionManager.Open();
         }
 

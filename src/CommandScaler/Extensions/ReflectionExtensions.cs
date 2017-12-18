@@ -24,10 +24,8 @@ namespace CommandScaler
             var interfaceTypes = givenType.GetInterfaces();
 
             foreach (var it in interfaceTypes)
-            {
                 if (it.IsGenericType && it.GetGenericTypeDefinition() == genericType)
                     return true;
-            }
 
             if (givenType.IsGenericType && givenType.GetGenericTypeDefinition() == genericType)
                 return true;
@@ -43,10 +41,8 @@ namespace CommandScaler
             var interfaceTypes = givenType.GetInterfaces();
 
             foreach (var it in interfaceTypes)
-            {
                 if (it.IsGenericType && it.GetGenericTypeDefinition() == genericType)
                     return it;
-            }
 
             if (givenType.IsGenericType && givenType.GetGenericTypeDefinition() == genericType)
                 return genericType;

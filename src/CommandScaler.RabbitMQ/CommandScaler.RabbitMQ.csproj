@@ -2,6 +2,17 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>grandchamp</Authors>
+    <Company />
+    <Product>CommandScaler</Product>
+    <Description>A simple command handler pattern implementation, but fully scalable with RabbitMQ. This is the RabbitMQ implementation package.</Description>
+    <Copyright>Nicolas Grandchamp</Copyright>
+    <PackageLicenseUrl>https://raw.githubusercontent.com/grandchamp/CommandScaler/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/grandchamp/CommandScaler</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/grandchamp/CommandScaler</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>rabbitmq commandhandler command mediator pattern</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>

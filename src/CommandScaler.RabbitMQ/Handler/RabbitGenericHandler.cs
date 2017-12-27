@@ -6,7 +6,6 @@ using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace CommandScaler.RabbitMQ.Handler
@@ -35,9 +34,6 @@ namespace CommandScaler.RabbitMQ.Handler
 
             consumer.Received += async (model, ea) =>
             {
-                _log.LogInformation($"Running Handler on: {Thread.CurrentThread.ManagedThreadId}");
-                _log.LogInformation($"Received command.");
-
                 var body = ea.Body;
                 var props = ea.BasicProperties;
                 var replyProps = channel.CreateBasicProperties();
@@ -53,15 +49,12 @@ namespace CommandScaler.RabbitMQ.Handler
                     var genericCommandHandlerType = typeof(ICommandHandler<,>);
                     var requestCommandHandlerType = genericCommandHandlerType.MakeGenericType(request.Command.GetType(), Type.GetType(request.CommandReturnType));
 
-                    var handler = _handlerFactory.Get(requestCommandHandlerType);
+                    var handler = (dynamic)_handlerFactory.Get(requestCommandHandlerType);
+                    var handleResult = (dynamic)handler.Handle((dynamic)request.Command);
 
-                    var handleMethodInfo = handler.GetType().GetMethod("Handle");
+                    await handleResult;
 
-                    var handleMethod = (Task)handleMethodInfo.Invoke(handler, new object[] { request.Command });
-
-                    await handleMethod;
-
-                    response = handleMethod.GetType().GetProperty("Result").GetValue(handleMethod);
+                    response = handleResult.Result;
                 }
                 catch (Exception ex)
                 {
